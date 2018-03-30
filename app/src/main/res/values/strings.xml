@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Baymax</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_scanbar">Scanner</string>
+    <string name="title_medicinas">Lista de medicinas</string>
+    <string name="title_avisos_salientes">Avisos salientes</string>
+    <string name="title_avisos_entrantes">Avisos entrantes</string>
     <string name="scan">Scanner</string>
 </resources>

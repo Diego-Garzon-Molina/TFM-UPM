@@ -1,0 +1,17 @@
+package com.example.diego.baymax;
+
+/**
+ * Created by Diego on 21/02/2018.
+ */
+
+public interface ScanResultReceiver {
+    /**
+     * function to receive scanresult
+     * @param codeFormat format of the barcode scanned
+     * @param codeContent data of the barcode scanned
+     */
+    public void scanResultData(String codeFormat, String codeContent);
+
+   // public void scanResultData(NoScanResultException noScanData);
+}
+
