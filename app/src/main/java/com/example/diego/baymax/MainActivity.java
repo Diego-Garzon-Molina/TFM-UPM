@@ -1,6 +1,7 @@
 package com.example.diego.baymax;
 
 import android.Manifest;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -30,7 +32,7 @@ import org.xmlpull.v1.XmlPullParser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-public class MainActivity extends AppCompatActivity implements ScanResultReceiver {
+public class MainActivity extends AppCompatActivity implements ScanResultReceiver, TimePickerDialog.OnTimeSetListener {
 
     private TextView mTextMessage, scan_format, scan_content;
     // private Button scanner;
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements ScanResultReceive
                         //   Toast.makeText(MainActivity.this,""+ xpp.getAttributeName(2),Toast.LENGTH_LONG).show();
                         scannerFragment = new FragmentoScanbar();
                         FT = getSupportFragmentManager().beginTransaction();
-                        FT.replace(R.id.scan_fragment, scannerFragment);
+                        FT.replace(R.id.view_fragments, scannerFragment);
                         FT.addToBackStack(null);
                         FT.commit();
                     }
@@ -59,21 +61,21 @@ public class MainActivity extends AppCompatActivity implements ScanResultReceive
                 case R.id.navigation_medicinas:
                     listaFragment = new FragmentoListaMedicinas();
                     FT = getSupportFragmentManager().beginTransaction();
-                    FT.replace(R.id.scan_fragment, listaFragment);
+                    FT.replace(R.id.view_fragments, listaFragment);
                     FT.addToBackStack(null);
                     FT.commit();
                     return true;
                 case R.id.navigation_avisos_entrantes:
                   /*  scannerFragment = new FragmentoScanbar();
                     FT = getSupportFragmentManager().beginTransaction();
-                    FT.replace(R.id.container, scannerFragment);
+                    FT.replace(R.id.view_fragments, scannerFragment);
                     FT.addToBackStack(null);
                     FT.commit();*/
                     return true;
                 case R.id.navigation_avisos_salientes:
                   /* scannerFragment = new FragmentoScanbar();
                     FT = getSupportFragmentManager().beginTransaction();
-                    FT.replace(R.id.container, scannerFragment);
+                    FT.replace(R.id.view_fragments, scannerFragment);
                     FT.addToBackStack(null);
                     FT.commit();*/
                     return true;
@@ -212,4 +214,51 @@ public class MainActivity extends AppCompatActivity implements ScanResultReceive
     }
 
 
+    @Override
+    public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+        int hora = hourOfDay;
+        int minuto = minute;
+        int contador = 0;
+        boolean repeticion = false;
+        int i = 0;
+        if (contador % 2 != 0) {
+            repeticion = true;
+        }
+
+     /*  while (i < 24 && horas[i] != null) {
+            if (horas[i].contains(":") && Integer.parseInt(horas[i].substring(0, horas[i].indexOf(":"))) == hourOfDay && Integer.parseInt(horas[i].substring(horas[i].indexOf(":") + 1)) == minute) {
+                repeticion = true;
+            }
+            i++;
+        }*/
+        if (repeticion) ;//horas[i] = null;
+        else {
+            TextView textView = (TextView) findViewById(R.id.HorasInsertadasTexto);
+            String newText = (String) textView.getText();
+            //LinearLayout layout = (LinearLayout) findViewById(R.id.HorasInsertadas);
+            // TextView textView = new TextView(calendario.this);
+
+            if (minute > 10) minuto = 20;
+            if (minute > 30) minuto = 40;
+            if (minute >= 50) {
+                hora += 1;
+                minuto = 0;
+            }
+            if (hora == 24) hora = 0;
+            if (minuto < 10) {
+                minuto = 0;
+                newText += "Hora seleccionada: " + hora + ":0" + minuto + "\n";
+                // textView.setText("Hora seleccionada: " + hora + ":0" + minuto+"\n");
+                //horas[contador] = Integer.toString(hora) + ":0" + Integer.toString(minuto);
+            } else {
+                newText += "Hora seleccionada: " + hora + ":" + minuto + "\n";
+                //textView.setText("Hora seleccionada: " + hora + ":" + minuto+"\n");
+                //horas[contador] = Integer.toString(hora) + ":" + Integer.toString(minuto);
+            }
+            if (!repeticion) textView.setText(newText);
+            //layout.addView(textView);
+
+        }
+        contador++;
+    }
 }

@@ -6,19 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.diego.baymax.MainActivity">
+    tools:context="com.example.diego.baymax.MainActivity"
+    android:weightSum="1">
 
     <LinearLayout
-        android:id="@+id/scan_fragment"
+        android:id="@+id/view_fragments"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1.01">
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="108dp"
         android:layout_gravity="bottom"
         android:orientation="vertical">
 

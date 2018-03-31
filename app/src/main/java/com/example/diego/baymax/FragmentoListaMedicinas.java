@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,8 @@ import com.google.zxing.integration.android.IntentResult;
  */
 
 public class FragmentoListaMedicinas extends Fragment {
-
+    private FragmentTransaction FT;
+    private FragmentoNuevaMedicinaCuestionario fNMCuestionario;
     private MiBaseDatos MDB;
     private int[] ident;
     private int iDAct = 0;
@@ -35,6 +37,7 @@ public class FragmentoListaMedicinas extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -42,7 +45,7 @@ public class FragmentoListaMedicinas extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lista_medicinas, container, false);
         MDB = new MiBaseDatos(getActivity().getApplicationContext());
-       // MDB.insertarMedicina("Medicina1","PrincipioActivo1");
+        MDB.insertarMedicina("Medicina1","PrincipioActivo1");
         ident = MDB.recuperaIds();
         listView = view.findViewById(R.id.lista);
         rellenaLista();
@@ -57,6 +60,13 @@ public class FragmentoListaMedicinas extends Fragment {
                 integrator.setResultDisplayDuration(0); // milliseconds to display result on screen after scan
                 integrator.setCameraId(0);  // Use a specific camera of the device
                 integrator.initiateScan();*/
+
+              //Esto debe ir una vez leido la medicina EN EL ON RESULT ACTIVITY
+                fNMCuestionario = new FragmentoNuevaMedicinaCuestionario();
+                FT = getActivity().getSupportFragmentManager().beginTransaction();
+                FT.replace(R.id.view_fragments, fNMCuestionario);
+                FT.addToBackStack(null);
+                FT.commit();
             }
         });
         return view;
@@ -73,7 +83,7 @@ public class FragmentoListaMedicinas extends Fragment {
             //rellenamos las ids de la lista en nuestro array identificador
             ident = MDB.recuperaIds();
             //creamos y rellenamos el adaptador de la lista
-            adaptador = new MiAdaptador(getContext(), MDB.recuperarMedicinaCursor());
+            adaptador = new MiAdaptador(getContext(), MDB.recuperarMedicinaArrray(""));
 
             listView.setAdapter(adaptador);
             adaptador.notifyDataSetChanged();
@@ -91,7 +101,7 @@ public class FragmentoListaMedicinas extends Fragment {
         //retrieve scan result
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         ScanResultReceiver parentActivity = (ScanResultReceiver) this.getActivity();
-        Toast.makeText(this.getActivity(),"activity Result",Toast.LENGTH_LONG).show();
+        Toast.makeText(this.getActivity(),"activity Result",Toast.LENGTH_SHORT).show();
         if (scanningResult != null) {
             //we have a result
             codeContent = scanningResult.getContents();

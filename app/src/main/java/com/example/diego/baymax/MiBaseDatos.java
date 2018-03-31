@@ -115,7 +115,7 @@ public class MiBaseDatos extends SQLiteOpenHelper {
 
         Cursor c = db.query("medicinas", valores_recuperar, null, null, null, null, null, null);
         while (c.moveToNext()) {
-            if (c.getString(c.getColumnIndex("nombre")).toLowerCase().contains(nombre.toLowerCase())) {
+            if (c.getString(c.getColumnIndex("nombreMedicina")).toLowerCase().contains(nombre.toLowerCase())) {
                 medicina = new Medicina(c.getInt(0), c.getString(1), c.getString(2));
                 arrayList.add(medicina);
             }

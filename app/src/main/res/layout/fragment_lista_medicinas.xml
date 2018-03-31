@@ -20,9 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_weight="0.43"
-
-
-        android:divider="@drawable/list_divider">
+        android:divider="@null"
+        android:dividerHeight="0dp">
         <!-- Divisor del ListView extraido de:
           https://danielme.com/tip-android-23-disenar-el-separador-de-filas-de-listview/-->
     </ListView>
