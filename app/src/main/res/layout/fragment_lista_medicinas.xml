@@ -26,8 +26,10 @@
         <!-- Divisor del ListView extraido de:
           https://danielme.com/tip-android-23-disenar-el-separador-de-filas-de-listview/-->
     </ListView>
-    <TextView
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bNuevaMedicina"
+        android:layout_width="123dp"
+
         android:layout_height="wrap_content"
-        android:text="HOLAAAAAA"/>
+        android:text="Nueva medicina" />
 </LinearLayout>
