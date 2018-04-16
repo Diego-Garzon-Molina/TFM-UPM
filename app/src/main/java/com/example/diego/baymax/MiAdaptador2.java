@@ -33,6 +33,7 @@ public class MiAdaptador2 extends ArrayAdapter<String> {
             @Override
             public void onClick(View view) {
                 arrayList.remove(position);
+
                 notifyDataSetChanged();
             }
         });

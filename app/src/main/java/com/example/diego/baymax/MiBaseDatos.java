@@ -105,7 +105,7 @@ public class MiBaseDatos extends SQLiteOpenHelper {
             //insertamos el registro en la Base de Datos
             db.insert("alarmas", null, valores);
         }
-        Toast.makeText(context,"alarmas insertadas",Toast.LENGTH_LONG).show();
+        // Toast.makeText(context,jsonAlarmas,Toast.LENGTH_LONG).show();
 
         db.close();
     }
@@ -125,7 +125,7 @@ public class MiBaseDatos extends SQLiteOpenHelper {
             //insertamos el registro en la Base de Datos
             db.insert("codigos", null, valores);
         }
-        Toast.makeText(context,"codigos insertados",Toast.LENGTH_LONG).show();
+       //  Toast.makeText(context,jsonCodigos,Toast.LENGTH_LONG).show();
         db.close();
     }
 

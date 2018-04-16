@@ -1,6 +1,10 @@
 package com.example.diego.baymax;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +31,8 @@ import java.util.Calendar;
  */
 
 public class FragmentoNuevaMedicinaCuestionario extends Fragment implements TimePickerDialog.OnTimeSetListener {
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
     private FragmentTransaction FT;
     private MiBaseDatos MDB;
     private FragmentoListaMedicinas fragmentoListaMedicinas;
@@ -126,7 +132,7 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                 int id = MDB.insertarMedicina("medicina insertada", "pa insertado");
                 JSONObject jAlarmas = new JSONObject();
                 JSONObject jCodigos = new JSONObject();
-                boolean[] checked = new boolean[7];
+                boolean[] diasChecked = new boolean[7];
                 boolean diaSeleccionado = false;
                 boolean horaSeleccionada = false;
                 if(!lAlarmas.isEmpty())horaSeleccionada = true;
@@ -134,14 +140,14 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                     Toast.makeText(getContext(),"Debe seleccionar al menos una hora",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                checked[0] = cb1.isChecked();
-                checked[1] = cb2.isChecked();
-                checked[2] = cb3.isChecked();
-                checked[3] = cb4.isChecked();
-                checked[4] = cb5.isChecked();
-                checked[5] = cb6.isChecked();
-                checked[6] = cb7.isChecked();
-                for (Boolean dias : checked) {
+                diasChecked[0] = cb1.isChecked();
+                diasChecked[1] = cb2.isChecked();
+                diasChecked[2] = cb3.isChecked();
+                diasChecked[3] = cb4.isChecked();
+                diasChecked[4] = cb5.isChecked();
+                diasChecked[5] = cb6.isChecked();
+                diasChecked[6] = cb7.isChecked();
+                for (Boolean dias : diasChecked) {
                     if(dias)diaSeleccionado = true;
                     try {
                         jAlarmas.accumulate("dias", dias);
@@ -160,10 +166,29 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                         e.printStackTrace();
                     }
                 }
-                Toast.makeText(getContext(), jAlarmas.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getContext(), jCodigos.toString(), Toast.LENGTH_SHORT).show();
                 MDB.insertarAlarmas(id, jAlarmas.toString());
                 MDB.insertarCodigos(id, jCodigos.toString());
+                declararAlarmas(diasChecked,diasChecked.length);
+                /*Context context = getContext();
+                alarmMgr = (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+                Calendar calendar = Calendar.getInstance();
+                for (int x = 1;x<diasChecked.length;x++) {
+                    if(diasChecked[x]){
+                        calendar.setTimeInMillis(System.currentTimeMillis());
+
+                        calendar.set(Calendar.HOUR_OF_DAY, 8);
+                        calendar.set(Calendar.MINUTE, 30);
+
+                    }
+                }
+// Alarma a las 8:30 a.m.
+
+
+// Repeticiones en intervalos de 20 minutos
+                alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                        1000 * 60 * 20, alarmIntent);*/
                 fragmentoListaMedicinas = new FragmentoListaMedicinas();
                 FT = getActivity().getSupportFragmentManager().beginTransaction();
                 FT.replace(R.id.view_fragments, fragmentoListaMedicinas);
@@ -172,15 +197,40 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
         });
         return view;
     }
-
-    public void listenerCB(View view) {
-        CheckBox cb = (CheckBox) view;
-        if (cb.isChecked()) {
-            cb.setChecked(false);
-            cbTodos.setChecked(false);
-        } else cb.setChecked(true);
+    public void declararAlarmas( boolean[] diasChecked, int diasSeleccionados) {
+        Calendar c = Calendar.getInstance();
+        int horasAux[] = new int[lAlarmas.size()];
+        int minutesAux[] = new int[lAlarmas.size()];
+        int dia = c.get(Calendar.DAY_OF_WEEK);
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+        int alarma_final = -1;
+        for (int i = 0; i <lAlarmas.size(); i++) {
+            if (lAlarmas.get(i) == null) break;
+            String horaAlarma = lAlarmas.get(i);
+            horasAux[i] = (Integer.parseInt(horaAlarma.substring(0, horaAlarma.indexOf(":"))));
+            minutesAux[i] = (Integer.parseInt(horaAlarma.substring(horaAlarma.indexOf(":") + 1)));
+        }
+        Calendar arrayCalendar[] = new Calendar[diasSeleccionados*lAlarmas.size()];
+        for(Calendar alarmaIndividual : arrayCalendar){
+            alarmaIndividual = Calendar.getInstance();
+            for (int i = 0; i <diasChecked.length; i++) {
+                for(int j = 0; j< lAlarmas.size();j++){
+                    if (!diasChecked[i]) break;
+                    else alarmaIndividual.set(Calendar.YEAR,Calendar.MONTH,i+1,horasAux[j],minutesAux[j]);
+                }
+            }
+        }
+        Context context = getContext();
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+        alarmIntent.setAction("whisky");
+        Toast.makeText(context,"Declaro alarmas" + Calendar.getInstance().getTimeInMillis()+10000,Toast.LENGTH_SHORT).show();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+       // TextView text = (TextView) findViewById(R.id.textViewCalendario);
+        // text.setText("espera" + tiempo + " alarma final " + alarma_final + " tiempo actual " + tiempo_actual);
+        manager.set(AlarmManager.RTC_WAKEUP,  Calendar.getInstance().getTimeInMillis()+10000, pendingIntent);
     }
-
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
         int hora = hourOfDay;

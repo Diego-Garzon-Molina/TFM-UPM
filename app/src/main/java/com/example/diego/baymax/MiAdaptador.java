@@ -39,6 +39,8 @@ public class MiAdaptador extends ArrayAdapter<Medicina> {
             @Override
             public void onClick(View view) {
                 MDB.borrarMedicina(id);
+                MDB.borrarAlarmas(id);
+                MDB.borrarCodigos(id);
                 arrayList.remove(position);
                 notifyDataSetChanged();
             }

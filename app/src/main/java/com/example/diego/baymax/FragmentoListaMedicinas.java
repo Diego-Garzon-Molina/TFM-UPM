@@ -74,12 +74,9 @@ public class FragmentoListaMedicinas extends Fragment {
     }
 
     public void rellenaLista() {
-
         int numFilas;
-
         //Comprobamos el numero de filas almacenadas en la BBDD
         numFilas = MDB.numerodeFilas();
-        Toast.makeText(getActivity().getApplicationContext(),""+numFilas,Toast.LENGTH_LONG).show();
         if (numFilas > 0) {
             //rellenamos las ids de la lista en nuestro array identificador
             ident = MDB.recuperaIds();
