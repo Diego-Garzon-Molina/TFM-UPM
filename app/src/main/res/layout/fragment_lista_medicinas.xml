@@ -30,5 +30,5 @@
         android:layout_width="123dp"
 
         android:layout_height="wrap_content"
-        android:text="Nueva medicina" />
+        android:text="@string/nueva_medicina" />
 </LinearLayout>

@@ -45,7 +45,6 @@ public class FragmentoListaMedicinas extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lista_medicinas, container, false);
         MDB = new MiBaseDatos(getActivity().getApplicationContext());
-        MDB.insertarMedicina("Medicina1","PrincipioActivo1");
         ident = MDB.recuperaIds();
         listView = view.findViewById(R.id.lista);
         rellenaLista();
@@ -64,7 +63,9 @@ public class FragmentoListaMedicinas extends Fragment {
               //Esto debe ir una vez leido la medicina EN EL ON RESULT ACTIVITY
                 fNMCuestionario = new FragmentoNuevaMedicinaCuestionario();
                 FT = getActivity().getSupportFragmentManager().beginTransaction();
-                FT.replace(R.id.view_fragments, fNMCuestionario);
+                FT.replace(R.id.view_fragments, fNMCuestionario,"fNMCuestionario");
+                getActivity().getSupportFragmentManager().executePendingTransactions();
+
                 FT.addToBackStack(null);
                 FT.commit();
             }
@@ -84,7 +85,6 @@ public class FragmentoListaMedicinas extends Fragment {
             ident = MDB.recuperaIds();
             //creamos y rellenamos el adaptador de la lista
             adaptador = new MiAdaptador(getContext(), MDB.recuperarMedicinaArrray(""));
-
             listView.setAdapter(adaptador);
             adaptador.notifyDataSetChanged();
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

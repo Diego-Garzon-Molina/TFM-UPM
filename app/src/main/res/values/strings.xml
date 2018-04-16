@@ -5,4 +5,16 @@
     <string name="title_avisos_salientes">Avisos salientes</string>
     <string name="title_avisos_entrantes">Avisos entrantes</string>
     <string name="scan">Scanner</string>
+    <string name="lunes">Lunes</string>
+    <string name="martes">Martes</string>
+    <string name="miercoles">Miercoles</string>
+    <string name="jueves">Jueves</string>
+    <string name="viernes">Viernes</string>
+    <string name="sabado">Sabado</string>
+    <string name="domingo">Domingo</string>
+    <string name="todos">Todos</string>
+    <string name="guardar">Guardar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="nueva_medicina">Nueva medicina</string>
+    <string name="hora">Insertar horas</string>
 </resources>
