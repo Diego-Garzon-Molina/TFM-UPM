@@ -134,10 +134,10 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                 JSONObject jCodigos = new JSONObject();
                 boolean[] diasChecked = new boolean[7];
                 boolean diaSeleccionado = false;
-                boolean horaSeleccionada = false;
-                if(!lAlarmas.isEmpty())horaSeleccionada = true;
-                else {
-                    Toast.makeText(getContext(),"Debe seleccionar al menos una hora",Toast.LENGTH_SHORT).show();
+
+                int diasSeleccionados = 0;
+                if (lAlarmas.isEmpty()) {
+                    Toast.makeText(getContext(), "Debe seleccionar al menos una hora", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 diasChecked[0] = cb1.isChecked();
@@ -148,15 +148,18 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                 diasChecked[5] = cb6.isChecked();
                 diasChecked[6] = cb7.isChecked();
                 for (Boolean dias : diasChecked) {
-                    if(dias)diaSeleccionado = true;
+                    if (dias) {
+                        diasSeleccionados++;
+                        diaSeleccionado = true;
+                    }
                     try {
                         jAlarmas.accumulate("dias", dias);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                if(!diaSeleccionado){
-                    Toast.makeText(getContext(),"Debe seleccionar al menos un dia",Toast.LENGTH_SHORT).show();
+                if (!diaSeleccionado) {
+                    Toast.makeText(getContext(), "Debe seleccionar al menos un dia", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (String object : lAlarmas) {
@@ -168,27 +171,8 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                 }
                 MDB.insertarAlarmas(id, jAlarmas.toString());
                 MDB.insertarCodigos(id, jCodigos.toString());
-                declararAlarmas(diasChecked,diasChecked.length);
-                /*Context context = getContext();
-                alarmMgr = (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-                Intent intent = new Intent(context, AlarmReceiver.class);
-                alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-                Calendar calendar = Calendar.getInstance();
-                for (int x = 1;x<diasChecked.length;x++) {
-                    if(diasChecked[x]){
-                        calendar.setTimeInMillis(System.currentTimeMillis());
+                declararAlarmas(diasChecked, diasSeleccionados);
 
-                        calendar.set(Calendar.HOUR_OF_DAY, 8);
-                        calendar.set(Calendar.MINUTE, 30);
-
-                    }
-                }
-// Alarma a las 8:30 a.m.
-
-
-// Repeticiones en intervalos de 20 minutos
-                alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                        1000 * 60 * 20, alarmIntent);*/
                 fragmentoListaMedicinas = new FragmentoListaMedicinas();
                 FT = getActivity().getSupportFragmentManager().beginTransaction();
                 FT.replace(R.id.view_fragments, fragmentoListaMedicinas);
@@ -197,40 +181,45 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
         });
         return view;
     }
-    public void declararAlarmas( boolean[] diasChecked, int diasSeleccionados) {
-        Calendar c = Calendar.getInstance();
+
+    public void declararAlarmas(boolean[] diasChecked, int diasSeleccionados) {
+        Calendar horaActual = Calendar.getInstance();
         int horasAux[] = new int[lAlarmas.size()];
         int minutesAux[] = new int[lAlarmas.size()];
-        int dia = c.get(Calendar.DAY_OF_WEEK);
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
-        int alarma_final = -1;
-        for (int i = 0; i <lAlarmas.size(); i++) {
+        for (int i = 0; i < lAlarmas.size(); i++) {
             if (lAlarmas.get(i) == null) break;
             String horaAlarma = lAlarmas.get(i);
             horasAux[i] = (Integer.parseInt(horaAlarma.substring(0, horaAlarma.indexOf(":"))));
             minutesAux[i] = (Integer.parseInt(horaAlarma.substring(horaAlarma.indexOf(":") + 1)));
         }
-        Calendar arrayCalendar[] = new Calendar[diasSeleccionados*lAlarmas.size()];
-        for(Calendar alarmaIndividual : arrayCalendar){
-            alarmaIndividual = Calendar.getInstance();
-            for (int i = 0; i <diasChecked.length; i++) {
-                for(int j = 0; j< lAlarmas.size();j++){
-                    if (!diasChecked[i]) break;
-                    else alarmaIndividual.set(Calendar.YEAR,Calendar.MONTH,i+1,horasAux[j],minutesAux[j]);
-                }
-            }
-        }
         Context context = getContext();
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Calendar arrayCalendar[] = new Calendar[diasSeleccionados * lAlarmas.size()];
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        alarmIntent.setAction("whisky");
-        Toast.makeText(context,"Declaro alarmas" + Calendar.getInstance().getTimeInMillis()+10000,Toast.LENGTH_SHORT).show();
+        alarmIntent.setAction("nueva notificacion");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-       // TextView text = (TextView) findViewById(R.id.textViewCalendario);
-        // text.setText("espera" + tiempo + " alarma final " + alarma_final + " tiempo actual " + tiempo_actual);
-        manager.set(AlarmManager.RTC_WAKEUP,  Calendar.getInstance().getTimeInMillis()+10000, pendingIntent);
+        int contadorAlarmas = 0;
+        for (int j = 0; j < lAlarmas.size(); j++) {
+            for (int i = 0; i < diasChecked.length; i++) {
+                if (!diasChecked[i]) continue;
+                arrayCalendar[contadorAlarmas] = Calendar.getInstance();
+                arrayCalendar[contadorAlarmas].set(
+                        horaActual.get(Calendar.YEAR),
+                        horaActual.get(Calendar.MONTH),
+                        (horaActual.get(Calendar.DAY_OF_MONTH) - horaActual.get(Calendar.DAY_OF_WEEK_IN_MONTH) + 1 + i),
+                        horasAux[j], minutesAux[j]);
+                 Toast.makeText(context, "alarmas declaradas: " + arrayCalendar[contadorAlarmas].getTime().toString(), Toast.LENGTH_SHORT).show();
+                if (arrayCalendar[contadorAlarmas].compareTo(Calendar.getInstance()) > 0) {
+                    manager.setRepeating(AlarmManager.RTC_WAKEUP, arrayCalendar[contadorAlarmas].getTimeInMillis(), 1000 * 60 * 60 * 24 * 7, pendingIntent);
+                } else {
+                    manager.setRepeating(AlarmManager.RTC_WAKEUP, arrayCalendar[contadorAlarmas].getTimeInMillis() + 1000 * 60 * 60 * 24 * 7, 1000 * 60 * 60 * 24 * 7, pendingIntent);
+                }
+                contadorAlarmas++;
+            }
+      }
+
     }
+
     @Override
     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
         int hora = hourOfDay;
