@@ -35,6 +35,7 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
     private PendingIntent alarmIntent;
     private FragmentTransaction FT;
     private MiBaseDatos MDB;
+    private int medicinaId;
     private FragmentoListaMedicinas fragmentoListaMedicinas;
     private Button bHora, bCancelar, bGuardar;
     private CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cbTodos;
@@ -129,7 +130,11 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
         {
             @Override
             public void onClick(View view) {
-                int id = MDB.insertarMedicina("medicina insertada", "pa insertado");
+                String nombreMedicina =  getArguments().getString("NombreMedicina");
+                String principioActivo = getArguments().getString("principio_activo");
+                Toast.makeText(getContext(), "NombreMedicina: " + nombreMedicina +" principiosActivos " + principioActivo, Toast.LENGTH_SHORT).show();
+
+                medicinaId = MDB.insertarMedicina(nombreMedicina, principioActivo);
                 JSONObject jAlarmas = new JSONObject();
                 JSONObject jCodigos = new JSONObject();
                 boolean[] diasChecked = new boolean[7];
@@ -169,8 +174,9 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                         e.printStackTrace();
                     }
                 }
-                MDB.insertarAlarmas(id, jAlarmas.toString());
-                MDB.insertarCodigos(id, jCodigos.toString());
+                Toast.makeText(getContext(),jAlarmas.toString(),Toast.LENGTH_LONG).show();
+                MDB.insertarAlarmas(medicinaId, jAlarmas.toString());
+                MDB.insertarCodigos(medicinaId, jCodigos.toString());
                 declararAlarmas(diasChecked, diasSeleccionados);
 
                 fragmentoListaMedicinas = new FragmentoListaMedicinas();
@@ -196,8 +202,10 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar arrayCalendar[] = new Calendar[diasSeleccionados * lAlarmas.size()];
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+        alarmIntent.putExtra("medicinaId",medicinaId);
+        alarmIntent.putExtra("nombreMedicina",getArguments().getString("NombreMedicina"));
         alarmIntent.setAction("nueva notificacion");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, medicinaId, alarmIntent, 0);
         int contadorAlarmas = 0;
         for (int j = 0; j < lAlarmas.size(); j++) {
             for (int i = 0; i < diasChecked.length; i++) {
@@ -206,11 +214,12 @@ public class FragmentoNuevaMedicinaCuestionario extends Fragment implements Time
                 arrayCalendar[contadorAlarmas].set(
                         horaActual.get(Calendar.YEAR),
                         horaActual.get(Calendar.MONTH),
-                        (horaActual.get(Calendar.DAY_OF_MONTH) - horaActual.get(Calendar.DAY_OF_WEEK_IN_MONTH) + 1 + i),
-                        horasAux[j], minutesAux[j]);
-                 Toast.makeText(context, "alarmas declaradas: " + arrayCalendar[contadorAlarmas].getTime().toString(), Toast.LENGTH_SHORT).show();
+                        (horaActual.get(Calendar.DAY_OF_MONTH) - horaActual.get(Calendar.DAY_OF_WEEK_IN_MONTH) + 2 + i),
+                        horasAux[j], minutesAux[j],0);
+               //  Toast.makeText(context, "alarmas declaradas: " + arrayCalendar[contadorAlarmas].getTime().toString(), Toast.LENGTH_SHORT).show();
                 if (arrayCalendar[contadorAlarmas].compareTo(Calendar.getInstance()) > 0) {
                     manager.setRepeating(AlarmManager.RTC_WAKEUP, arrayCalendar[contadorAlarmas].getTimeInMillis(), 1000 * 60 * 60 * 24 * 7, pendingIntent);
+                    //manager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() +10000, 20000, pendingIntent);
                 } else {
                     manager.setRepeating(AlarmManager.RTC_WAKEUP, arrayCalendar[contadorAlarmas].getTimeInMillis() + 1000 * 60 * 60 * 24 * 7, 1000 * 60 * 60 * 24 * 7, pendingIntent);
                 }

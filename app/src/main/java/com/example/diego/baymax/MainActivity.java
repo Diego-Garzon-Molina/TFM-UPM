@@ -32,7 +32,7 @@ import org.xmlpull.v1.XmlPullParser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-public class MainActivity extends AppCompatActivity implements ScanResultReceiver{
+public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage, scan_format, scan_content;
     // private Button scanner;
@@ -92,70 +92,10 @@ public class MainActivity extends AppCompatActivity implements ScanResultReceive
         scan_content = (TextView) findViewById(R.id.scan_content);
         scan_format = (TextView) findViewById(R.id.scan_format);
 
-
         permisoCamara();
-        Resources res = getResources();
-        XmlResourceParser xpp = res.getXml(R.xml.prueba2);
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            // Parseamos el documento obteniendolo de los recursos y lo almacenamos
-            // en un objeto Document
-            Document doc = builder.parse(getResources()
-                    .openRawResource(R.raw.prueba2));
-
-            // Obtenemos el elemento raiz del documento, libros
-            Element raiz = doc.getDocumentElement();
-
-            // Obtenemos todos los elementos llamados libro, que cuelgan
-            // de la raiz
-            String cod_nacion="";
-            String nombre="";
-            String contenido="";
-            String[] principioActivo= new String[100];
-            NodeList items = raiz.getElementsByTagName("prescription");
-            for (int i = 9; i < 10; i++) {
-                Node nodoPrescripcion = items.item(i);
-                for (int j = 0; j < nodoPrescripcion.getChildNodes().getLength(); j++) {
-                    Node nodoActual = nodoPrescripcion.getFirstChild();
-                    cod_nacion= nodoPrescripcion.getChildNodes().item(1).getChildNodes().item(0).getNodeValue();
-                    //Toast.makeText(MainActivity.this, cod_nacion, Toast.LENGTH_LONG).show();
-                        if (cod_nacion.equals("606528")) {
-
-                            for (int x = 0; x < nodoPrescripcion.getChildNodes().getLength(); x++) {
-                                 nodoActual = nodoPrescripcion.getChildNodes().item(x);
-                                if (nodoActual.getNodeName().equalsIgnoreCase("des_nomco")) {
-                                    nombre = nodoActual.getChildNodes().item(0)
-                                            .getNodeValue();
-                                }
-                                if (nodoActual.getNodeName().equalsIgnoreCase("contenido")) {
-                                    contenido = nodoActual.getChildNodes().item(0)
-                                            .getNodeValue();
-                                }
-                                if (nodoActual.getNodeName().equalsIgnoreCase("formasfarmaceuticas")) {
-                                    for(int z=0; z< nodoActual.getChildNodes().getLength(); z++){
-                                        principioActivo[z] = nodoActual.getChildNodes().item(0).getNodeValue();
-                                    }
-
-                                }
-                            }
-                            Toast.makeText(MainActivity.this, cod_nacion + "" + nombre + " " + contenido + " " + principioActivo, Toast.LENGTH_LONG).show();
-                            break;
-                        }
-                       // Toast.makeText(MainActivity.this, cod_nacion + " " + nombre + " " + contenido + " " + principioActivo, Toast.LENGTH_LONG).show();
-
-
-
-
-                    }
-                }
-
-            //mTextMessage = (TextView) findViewById(R.id.message);
-            BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-            navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        } catch (Exception e) {
-
-        }
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId( R.id.navigation_medicinas);
 
     }
 
@@ -179,40 +119,6 @@ public class MainActivity extends AppCompatActivity implements ScanResultReceive
 
         }
     }
-
-    /**
-     * function handle scan result
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param intent
-     */
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        //retrieve scan result
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-
-        if (scanningResult != null) {
-            //we have a result
-            String scanContent = scanningResult.getContents();
-            String scanFormat = scanningResult.getFormatName();
-
-            // display it on screen
-            scan_format.setText("FORMAT: " + scanFormat);
-            scan_content.setText("CONTENT: " + scanContent);
-
-        } else {
-            Toast toast = Toast.makeText(getApplicationContext(), "No scan data received!", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-
-    @Override
-    public void scanResultData(String codeFormat, String codeContent) {
-        // display it on screen
-        scan_format.setText("FORMAT: " + codeFormat);
-        scan_content.setText("CONTENT: " + codeContent);
-    }
-
 
 
 }

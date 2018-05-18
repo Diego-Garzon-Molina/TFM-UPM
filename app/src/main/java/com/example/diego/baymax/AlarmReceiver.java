@@ -26,8 +26,9 @@ public class AlarmReceiver extends android.content.BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent)  {
-
-        if(!intent.getAction().contains("alarma")) notification(notificaciones, R.drawable.baymax,"Hora de la medicacion","Debe tomar:\nNolotil 575 mg cáps duras.\nPrednisona Kern Pharma 30 mg",context);
+        int medicinaId = intent.getIntExtra("medicinaId",0);
+        String nombreMedicina = intent.getStringExtra("nombreMedicina");
+        if(!intent.getAction().contains("alarma")) notification(notificaciones, R.drawable.baymax,"Hora de la medicacion",nombreMedicina,context,medicinaId);
         else alarmas(context);
         notificaciones++;
     }
@@ -37,11 +38,11 @@ public class AlarmReceiver extends android.content.BroadcastReceiver {
         context.startActivity(intent);
 
     }
-    public void notification(int id, int iconId, String titulo, String contenido, Context context ) {
+    public void notification(int id, int iconId, String titulo, String contenido, Context context, int medicinaId ) {
         NotificationManager notifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent notificationIntent = new Intent(context, FragmentoScanbar.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        notificationIntent.putExtra("menuFragment","FragmentoScanbar");
+        PendingIntent contentIntent = PendingIntent.getActivity(context, medicinaId, notificationIntent, 0);
         // Estructurar la notificación
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(iconId)
@@ -61,6 +62,6 @@ public class AlarmReceiver extends android.content.BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent,0);
         //Lanzamos la alarma 10 minutos despues de la notificacion
         manager_notificacion.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+1000*60*10, pendingIntent);
-
+       // manager_notificacion.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+10000, pendingIntent);
     }
 }
